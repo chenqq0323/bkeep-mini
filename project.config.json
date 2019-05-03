@@ -1,0 +1,16 @@
+{
+	"description": "project description",
+	"setting": {
+		"urlCheck": false,
+		"es6": false,
+		"postcss": false,
+		"minified": true,
+		"newFeature": true,
+		"autoAudits": false
+	},
+	"compileType": "miniprogram",
+	"appid": "wx881ee84a416f72b7",
+	"projectname": "bkeep",
+	"miniprogramRoot": "dist/",
+	"condition": {}
+}

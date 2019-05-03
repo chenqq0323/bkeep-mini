@@ -1,0 +1,86 @@
+<template lang="wxml">
+  <view class="category-component">
+
+    <view wx:for="{{ list }}">
+      <view class="header fs14">{{ item.name }}</view>
+      <repeat for="{{item.children}}" key="index" index="index" item="child">
+        <category :category.sync="child" @choseItem.user="setCategory"></category>
+      </repeat>
+    </view>
+
+    <navigator url="/pages/categories/category_form?type={{ type }}">
+      <view class="add-wallet">
+        <image src="../../public/images/wallet-add.png"></image>
+        <text class="fs16">添加分类</text>
+      </view>
+    </navigator>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import wxRequest from '@/utils/wxRequest'
+  import Category from '@/components/category_item'
+  export default class choseCategory extends wepy.page {
+    data = {
+      list: [],
+      type: 'expend',
+      already_load: false
+    }
+
+    components = {
+			category: Category
+    };
+
+    onLoad (options) {
+      this.type = options.type
+    }
+    
+    onShow () {
+      this.getCategory()
+    }
+
+    methods = {
+      setCategory (category) {
+        const pages = getCurrentPages()
+        const prevPage = pages[pages.length - 2]
+        if (this.type == 'expend') {
+          prevPage.$Expend$setCategory(category)
+        } else {
+          prevPage.$Income$setCategory(category)
+        }
+        wepy.navigateBack({
+          delta: 1
+        })
+      }
+    }
+
+    async getCategory () {
+      const data = await wxRequest.Get('account-sort/get-account-sort-tree', { category: this.type })
+      this.last = data.last
+      this.list = data.data
+      this.$apply()
+    } 
+  }
+</script>
+<style lang="scss" src="@/public/styles/chose_category.scss"></style>
+<style lang="scss">
+  .category-component {
+    > view {
+      overflow: hidden;
+    }
+  }
+  .add-wallet {
+    display:flex;
+    justify-content:center;
+    padding:8rpx 0;
+    color:#999;
+    margin:8rpx 0;
+  }
+  .add-wallet image {
+    width:50rpx;
+    height:50rpx;
+    display:inline-block;
+    margin-right:8rpx;
+  }
+</style>

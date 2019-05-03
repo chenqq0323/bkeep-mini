@@ -1,0 +1,62 @@
+<template>
+  <view>
+    <form bindsubmit="formSubmit">
+      <i-cell title="月预算">
+        <input slot="footer" value="{{ monthBudget }}" name="monthBudget" type="text" placeholder="请输入月预算"/>
+      </i-cell>
+
+      <view class="zan-btns" style="margin: 12px;">
+        <button class="ljt-btn" formType="submit">保存</button>
+      </view>
+    </form>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import wxRequest from '@/utils/wxRequest'
+  import tip from '@/utils/tip'
+  export default class NicknameEdit extends wepy.page {
+    config = {
+      navigationBarTitleText: '月预算设置',
+      "usingComponents": {
+        "i-cell": "../../public/iview/cell/index",
+        "i-button": "../../public/iview/button/index"
+      }
+    }
+
+    data = {
+      monthBudget: ''
+    }
+
+    onLoad () {
+      this.getUser()
+    }
+    
+    methods = {
+      async formSubmit (e) {
+        const monthBudget = e.detail.value.monthBudget
+        if (monthBudget === '') {
+          tip.error('随便输点东西也行呀~')
+          return false
+        }
+        console.log(e.detail.value)
+        await wxRequest.Put('user/update-month-budget', {monthBudget: monthBudget })
+        wepy.navigateBack({
+          delta: 1
+        })
+      }
+    }
+
+    async getUser () {
+      const data = await wxRequest.Get('user/users')
+      this.monthBudget = data.data.monthBudget
+      this.$apply()
+    }
+  }
+</script>
+<style>
+  page {
+    background:#f4f4f4;
+  }
+</style>

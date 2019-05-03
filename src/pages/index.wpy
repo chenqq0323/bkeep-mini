@@ -1,0 +1,236 @@
+<template>
+  <view class="container">
+    <view class="header">
+      <image class="bg" src="https://xiaoyounger.com/covers/default-10.jpeg"></image>
+      <view class="level-2">
+        <view class="fs14">
+          <text>今日支出</text>
+        </view>
+        <view class="fs21 today-expend">{{ header.todayOutlay }}</view>
+        <view class="overflow-hide">
+          <view class="pull-left fs14">本月支出 {{ header.monthOutlay }}</view>
+          <view class="pull-right fs14" wx:if="{{ header.remainBudget }}">月预算剩余 {{ header.remainBudget }}</view>
+          <view class="pull-right fs14" wx:if="{{ !header.remainBudget }}">月预算未开启</view>
+        </view>
+      </view>
+      
+      <i-notice-bar icon="systemprompt" wx:if="{{ header.show_notice_bar }}">
+        <navigator wx:if="{{ header.notice_bar_path }}" url="{{ header.notice_bar_path }}">
+          <text>{{ header.notice_text }}</text>
+        </navigator>
+        <text wx:else>{{ header.notice_text }}</text>
+      </i-notice-bar>
+    </view>
+    
+    <view class="zan-btns new-record">
+      <form name='pushMsgFm' report-submit='true' bindsubmit='getFormID'>
+        <button class="zan-btn jz-btn btn-shadow" bindtap="handleBkeepClick" 
+        bindlongtap="recorder" bindtouchstart="touchStart" bindtouchend="touchEnd" form-type="submit">记一笔</button>
+      </form>
+      
+      <!-- <navigator url="/pages/statements/create">
+        <button class="zan-btn jz-btn btn-shadow">记一笔</button>
+      </navigator> -->
+    </view>
+
+    <view class="statement-list">
+      <repeat for="{{ list }}" key="index" index="index" item="item">
+        <StatementItem :statement.sync="item"></StatementItem>
+      </repeat>
+    </view>
+    
+    <view wx:if="{{ list.length == 0 }}">
+      <empty :title.sync="emptyTitle"></empty>
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import wxRequest from '@/utils/wxRequest'
+  import Session from '@/utils/session'
+  import Empty from '@/components/empty'
+  import StatementItem from '@/components/index/statement'
+  import { getStore } from 'wepy-redux'
+  import { asyncList } from '@/store/actions'
+  import Host from '@/utils/host'
+
+  const recorderManager = wx.getRecorderManager()
+  const innerAudioContext = wx.createInnerAudioContext()
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '首页',
+      "usingComponents": {
+        "i-notice-bar": "../public/iview/notice-bar/index"
+      }
+    }
+
+    data = {
+      emptyTitle: '本周还没有开始记账哦~',
+      orderEmptyTitle: '无预购清单，点击下方添加一笔吧',
+      list: [],
+      header: {},
+      touchStartTime: 0,
+      touchEndTime: 0,
+      tempFilePath: '',
+      openId: ''
+    }
+
+    components = {
+      empty: Empty,
+      orderEmpty: Empty,
+      StatementItem
+		}
+
+    onShow () {
+      this.getOpenId()
+      this.getHeader()
+      this.getList()
+    }
+
+    async getOpenId () {
+      const openId = await wxRequest.GetOpenId()
+      this.openId = openId
+      this.$apply()
+    }
+
+    async getHeader () {
+      if (Session.get('header_load_cache')) {
+        this.header = Session.get('header_load_cache')
+        this.$apply()
+      }
+
+      const data = await wxRequest.Get('index/get-today-info')
+      console.log(data.data)
+      this.header = data.data
+      Session.set('header_load_cache', this.header)
+      this.$apply()
+    }
+
+    async getList() {
+      if (Session.get('index_load_cache')) {
+        this.list = Session.get('index_load_cache')
+        this.$apply()
+      }
+
+      const store = getStore()
+      await store.dispatch(asyncList())
+      const res = store.getState().statement.statements
+      this.list = res
+      Session.set('index_load_cache', res)
+      this.$apply()
+    }
+
+    computed = {
+      showEmpty () {
+        return this.list.length <= 0
+      }
+    }
+
+    handleBkeepClick(e) {
+      var that = this
+      if (that.touchEndTime - that.touchStartTime < 350) {
+        wx.navigateTo({
+          url: '/pages/statements/create'
+        })
+      }
+    }
+
+    recorder() {
+      const options = {
+        duration: 10000,//指定录音的时长，单位 ms
+        sampleRate: 16000,//采样率
+        numberOfChannels: 1,//录音通道数
+        encodeBitRate: 64000,//编码码率
+        format: 'mp3',//音频格式，有效值 aac/mp3
+        frameSize: 50,//指定帧大小，单位 KB
+      }
+      //开始录音
+      recorderManager.start(options);
+      recorderManager.onStart(() => {
+        console.log('recorder start')
+      });
+      //错误回调
+      recorderManager.onError((res) => {
+        console.log(res);
+      })
+
+      console.log('长按')
+    }
+
+    /// 按钮触摸开始触发的事件
+    touchStart(e) {
+      this.touchStartTime = e.timeStamp
+    }
+    
+
+    /// 按钮触摸结束触发的事件
+    touchEnd(e) {
+      this.touchEndTime = e.timeStamp
+      const that = this
+      // 判断是单击还是长按
+      if (this.touchEndTime - this.touchStartTime > 350) {
+        recorderManager.stop();
+        recorderManager.onStop((res) => {
+        this.tempFilePath = res.tempFilePath;
+        that.upload(res.tempFilePath)
+        })
+      }
+    }
+    upload() {
+      wx.showLoading({
+        title: '识别中，请稍后',
+      })
+      setTimeout(function () {
+        wx.hideLoading()
+      }, 2000)
+      const filePath = this.tempFilePath
+      let url = Host.url + '/voice/transfer'
+      const that = this
+      console.log(url)
+      wx.uploadFile({
+        url: url,
+        filePath: filePath,
+        name: 'file',
+        header: {
+          'content-type': 'multipart/form-data',
+          'X-WX-SKey': that.openId
+        },
+        success: function(res) {
+          wx.hideLoading()
+          var data = JSON.parse(res.data)
+          if (data.code === 10000 && data.data) {
+            that.getList()
+            wx.showToast({
+              title: '语音记账成功',
+              icon: 'success',
+              duration: 2000
+            })
+          } else {
+            wx.showToast({
+              title: '语音记账失败，请重试。',
+              icon: 'none',
+              duration: 2000
+            })
+          }
+        },
+        fail: function(res) {
+          wx.hideLoading()
+          console.log(res)
+          wx.showModal({
+            title: '提示',
+            content: '网络请求失败，请确保网络正常',
+            showCancel: false
+          })
+        }
+      })
+    }
+
+    getFormID(e) {
+      console.log(e.detail.formId)
+    }
+  }
+</script>
+<style lang="scss" src="@/public/styles/index.scss"></style>
