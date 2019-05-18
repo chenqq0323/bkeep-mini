@@ -23,7 +23,7 @@
     </view>
     
     <view class="zan-btns new-record">
-      <form name='pushMsgFm' report-submit='true' bindsubmit='getFormID'>
+      <form name='pushMsgFm' report-submit='true' bindsubmit='submitFormId'>
         <button class="zan-btn jz-btn btn-shadow" bindtap="handleBkeepClick" 
         bindlongtap="recorder" bindtouchstart="touchStart" bindtouchend="touchEnd" form-type="submit">记一笔</button>
       </form>
@@ -75,7 +75,10 @@
       touchStartTime: 0,
       touchEndTime: 0,
       tempFilePath: '',
-      openId: ''
+      openId: '',
+      wxForm: {
+        formId: ''
+      }
     }
 
     components = {
@@ -228,8 +231,10 @@
       })
     }
 
-    getFormID(e) {
+    submitFormId(e) {
       console.log(e.detail.formId)
+      this.wxForm.formId = e.detail.formId;
+      wxRequest.Post(`message//add-formid`, this.wxForm)
     }
   }
 </script>

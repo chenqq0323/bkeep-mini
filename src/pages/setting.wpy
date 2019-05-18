@@ -63,10 +63,10 @@
 
     <view class="setting-container">
       <i-cell-group>
-        <i-cell 
+        <!-- <i-cell 
           title="消息通知"
           is-link url="/pages/message/message">
-        </i-cell>
+        </i-cell> -->
 
         <!-- <i-cell 
           title="预算管理"

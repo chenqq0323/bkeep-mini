@@ -18,28 +18,28 @@
 	<view class="ljt-tab fs16">
 		<view class="time">{{ monthAndDay }}</view>
 		<view class="{{ tabActive == 'single' ? 'active' : '' }}" @tap="changeTab('single')">单笔明细</view>
-		<view class="{{ tabActive == 'category' ? 'active' : '' }}" @tap="changeTab('category')">分类明细</view>
+		<!-- <view class="{{ tabActive == 'category' ? 'active' : '' }}" @tap="changeTab('category')">分类明细</view> -->
 	</view>
 
   <view class="assets">
     <view hidden="{{ tabActive == 'category' || singleList.length == 0 }}">
-			<view class="left-amount">
+			<!-- <view class="left-amount">
 				<text class="income income-border">收入: {{ singleData.surplus.income }}</text>
 				<text class="expend expend-border">支出: {{ singleData.surplus.expend }}</text>
 				<text class="surplus surplus-border">结余: {{ singleData.surplus.surplus }}</text>
-			</view>
+			</view> -->
 
-			<view class="tiaomu" wx:for="{{ singleData.list }}" @tap="showStatement('{{ item.id }}')">
+			<view class="tiaomu" wx:for="{{ singleList }}" @tap="showStatement('{{ item.id }}')">
 				<view class="information">
-					<image src="{{ item.category_icon }}"></image>
+					<image src="{{ item.iconPath }}"></image>
 					<view class="title">
 						<view class="fs14">{{ item.category }}</view>
 						<view class="fs12 description" wx:if="{{ item.description != null }}">{{ item.description }}</view>
-						<view class="col999 fs12">{{ item.created_at }} · {{ item.wallet }}</view>
+						<view class="col999 fs12">{{ item.timeStr }} · {{ item.asset }}</view>
 					</view>
 				</view>
 
-				<view class="money {{ item.type }}">{{ item.amount }}</view>
+				<view class="money {{ item.type }}">{{ item.money }}</view>
 			</view>
     </view>
 
@@ -129,9 +129,10 @@
 						curObj.background = this.endColor
 						this.daySelect[2] = curObj
 					} else if (curDate.getTime() == endDate.getTime()) {
-						this.daySelect.splice(1, 1)
+						this.daySelect.splice(1, 2)
 					} else if (curDate.getTime() == startDate.getTime()) {
-						this.daySelect.splice(2, 1)
+						this.daySelect.splice(0, 3)
+						this.daySelect.push(this.daySelectObject(NowDate.getFullYear(), NowDate.getMonth() + 1, this.today, '#2196F3'))
 					} else {
 						curObj.background = this.startColor
 						this.daySelect[1] = curObj
@@ -173,10 +174,9 @@
 		}
 
 		async getChart() {
-			const res = await wxRequest.Get('chart', this.timeParams())
-			this.singleData = res.single
-			this.singleList = this.singleData.list
-			this.mutipleData = res.categories
+			const res = await wxRequest.Get('record/list-by-time', this.timeParams())
+			console.log(res)
+			this.singleList = res.data
 			this.$apply()
 		}
 
@@ -196,12 +196,13 @@
 
 			if (length <= 2) {
 				let start = this.daySelect[length - 1]
-        query.start_time = `${start.year}-${start.mon}-${start.day}`
+		
+        query.startTime = `${start.year}-${start.mon}-${start.day}`
       } else {
 				let start = this.daySelect[1]
 				let end = this.daySelect[2]
-        query.start_time = `${start.year}-${start.mon}-${start.day}`
-        query.end_time = `${end.year}-${end.mon}-${end.day}`
+        query.startTime = `${start.year}-${start.mon}-${start.day}`
+        query.endTime = `${end.year}-${end.mon}-${end.day}`
 			}
 			return query
 		}
@@ -221,12 +222,12 @@
 			monthAndDay() {
 				let str = ''
 				let query = this.timeParams()
-				if (typeof query.start_time != 'undefined') {
-					let startArray = query.start_time.split('-')
+				if (typeof query.startTime != 'undefined') {
+					let startArray = query.startTime.split('-')
 					str = startArray[1] + '-' + startArray[2]
 				}
-				if (typeof query.end_time != 'undefined') {
-					let endArray = query.end_time.split('-')
+				if (typeof query.endTime != 'undefined') {
+					let endArray = query.endTime.split('-')
 					str += ' ~ '
 					str += endArray[1] + '-' + endArray[2]
 				}

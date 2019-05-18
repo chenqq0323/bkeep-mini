@@ -83,17 +83,17 @@ export default class extends wepy.app {
           text: "首页"
         },
         {
-          pagePath: "pages/settings/super_chart",
+          pagePath: "pages/chart",
           iconPath: "public/images/settings/statistic.png",
           selectedIconPath: "public/images/settings/statistic-active.png",
           text: "统计"
         },
-        /** {
-          pagePath: "pages/asset",
+        {
+          pagePath: "pages/settings/super_chart",
           iconPath: "public/images/settings/asset.png",
           selectedIconPath: "public/images/settings/asset-active.png",
-          text: "资产"
-        }, */
+          text: "报表"
+        },
         {
           pagePath: "pages/setting",
           iconPath: "public/images/settings/user_1.png",

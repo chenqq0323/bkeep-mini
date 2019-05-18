@@ -20,7 +20,7 @@
           <i-switch value="{{ user.monthBudgetSwitch }}" bind:change="changeMonthBudgetSwitch" slot="footer"></i-switch>
         </view>
       </view>
-      <view class="notice-remind">
+      <!-- <view class="notice-remind">
         <view>
           <text class="notice-title">记账提醒</text>
           <text class="notice-time">每天 22:00</text>
@@ -28,7 +28,7 @@
         <view>
           <i-switch value="{{ user.remindSwitch }}" bind:change="changeRemind" slot="footer"></i-switch>
         </view>
-      </view>
+      </view> -->
     </view>
   </view>
 </template>
