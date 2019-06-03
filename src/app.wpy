@@ -25,23 +25,23 @@ export default class extends wepy.app {
 
       // 余额设置
       "pages/forms/asset_form",
-      "pages/forms/budget_form",
+      // "pages/forms/budget_form",
       "pages/forms/icons_chose",
 
       // 预算
-      "pages/budgets/budget",
-      "pages/budgets/child_budget",
+      // "pages/budgets/budget",
+      // "pages/budgets/child_budget",
 
       // 设置
-      "pages/settings/feedback",
+      // "pages/settings/feedback",
       "pages/settings/header",
       "pages/settings/super_chart",
       "pages/settings/user_info",
       "pages/settings/nickname_edit",
-      "pages/settings/prepare_buy",
+      // "pages/settings/prepare_buy",
       "pages/settings/super_statement",
       "pages/settings/about",
-      "pages/settings/search",
+      // "pages/settings/search",
       
       // 编辑账单类型分类/资产分类
       "pages/categories/list",
@@ -53,15 +53,15 @@ export default class extends wepy.app {
       "pages/assets/asset_detail",
       
       // 消息
-      "pages/message/message",
-      "pages/message/message_detail",
+      // "pages/message/message",
+      // "pages/message/message_detail",
 
       // 月账单
-      "pages/months/index",
+      // "pages/months/index",
 
       // 好友
-      "pages/friends/index",
-      "pages/friends/search"
+      // "pages/friends/index",
+      // "pages/friends/search"
     ],
     window: {
       backgroundColor: "#efefef",

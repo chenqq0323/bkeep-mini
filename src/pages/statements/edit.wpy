@@ -3,7 +3,6 @@
     <view class="comonent-list">
       <Expend :statement.sync="statement" @submit.user="submit" wx:if="{{ current == 'expend' }}"/>
       <Income :statement.sync="statement" @submit.user="submit" wx:if="{{ current == 'income' }}"/>
-      <!-- <Transfer :statement.sync="statement" @submit.user="submit" wx:if="{{ current == 'transfer' }}"/> -->
     </view>
   </view>
 </template>
@@ -13,7 +12,6 @@
   import wxRequest from '@/utils/wxRequest'
   import Expend from '@/components/statement/expend'
   import Income from '@/components/statement/income'
-  import Transfer from '@/components/statement/transfer'
   import { getStore } from 'wepy-redux'
   import { addStatement, modifyStatement } from '@/store/actions'
   import tip from '@/utils/tip'
@@ -89,8 +87,7 @@
 
     components = {
       Expend,
-      Income,
-      Transfer
+      Income
     }
 
   }

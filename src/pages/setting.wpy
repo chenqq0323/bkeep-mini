@@ -63,20 +63,6 @@
 
     <view class="setting-container">
       <i-cell-group>
-        <!-- <i-cell 
-          title="消息通知"
-          is-link url="/pages/message/message">
-        </i-cell> -->
-
-        <!-- <i-cell 
-          title="预算管理"
-          is-link url="/pages/budgets/budget">
-        </i-cell> -->
-
-        <!-- <i-cell 
-          title="首页看板设置"
-          is-link url="/pages/settings/header">
-        </i-cell> -->
 
         <i-cell 
           title="设置资产分类"
@@ -92,22 +78,12 @@
           title="收入分类管理" 
           is-link url="/pages/categories/list?type=income">
         </i-cell>
-
-        <!-- <i-cell 
-          title="反馈与建议" 
-          is-link url="/pages/settings/feedback">
-        </i-cell> -->
-
         <i-cell 
           title="关于有本账簿" 
           is-link url="/pages/settings/about"
           value="{{ version }}">
         </i-cell>
       </i-cell-group>
-    </view>
-
-    <view class="recommend-container">
-      <button bindtap="openSetting">打开设置页</button>
     </view>
 
     <i-load-more i-class="bottom-text" tip="有本账簿" loading="{{ false }}" />
@@ -127,11 +103,7 @@
       "usingComponents": {
         "i-cell-group": "../public/iview/cell-group/index",
         "i-cell": "../public/iview/cell/index",
-        "i-load-more": "../public/iview/load-more/index",
-        "i-grid": "../public/iview/grid/index",
-        "i-grid-item": "../public/iview/grid-item/index",
-        "i-grid-icon": "../public/iview/grid-icon/index",
-        "i-grid-label": "../public/iview/grid-label/index"
+        "i-load-more": "../public/iview/load-more/index"
       }
     }
     
@@ -205,7 +177,6 @@
 
     async getCurrentUser () {
       const cacheData = Session.get('user_load_cache')
-      console.log(cacheData)
       if (cacheData) {
         this.user = cacheData
         this.$apply()  

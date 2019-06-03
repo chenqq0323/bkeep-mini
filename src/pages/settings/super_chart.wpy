@@ -150,6 +150,11 @@
         year: this.year,
         month: this.month
       })
+      if (data.data === '请先登录！') {
+        	 wx.switchTab({
+             	url: '/pages/setting'
+         	})
+      }
       this.header = data.data
       this.$apply()
     }

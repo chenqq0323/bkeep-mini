@@ -37,7 +37,6 @@
   import wxRequest from '@/utils/wxRequest'
   import List from '@/components/category_list'
   import Host from '@/utils/host'
-  import resource from '@/utils/resource'
   export default class CategoryList extends wepy.page {
     config = {
       navigationBarTitleText: '分类管理'

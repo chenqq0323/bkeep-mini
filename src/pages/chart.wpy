@@ -23,12 +23,6 @@
 
   <view class="assets">
     <view hidden="{{ tabActive == 'category' || singleList.length == 0 }}">
-			<!-- <view class="left-amount">
-				<text class="income income-border">收入: {{ singleData.surplus.income }}</text>
-				<text class="expend expend-border">支出: {{ singleData.surplus.expend }}</text>
-				<text class="surplus surplus-border">结余: {{ singleData.surplus.surplus }}</text>
-			</view> -->
-
 			<view class="tiaomu" wx:for="{{ singleList }}" @tap="showStatement('{{ item.id }}')">
 				<view class="information">
 					<image src="{{ item.iconPath }}"></image>
@@ -111,9 +105,11 @@
 					let startDate = new Date(`${start.year}-${start.mon}-${start.day}`)
 					let choseDate = new Date(`${detail.year}-${detail.month}-${detail.day}`)
 					if (startDate < choseDate) {
+						console.log("1111")
 						curObj.background = this.endColor
 						this.daySelect.push(curObj)
 					} else {
+						console.log("2222")
 						this.daySelect[1].background = this.endColor
 						curObj.background = this.startColor
 						this.daySelect.splice(1, 0, curObj)
@@ -174,10 +170,19 @@
 		}
 
 		async getChart() {
-			const res = await wxRequest.Get('record/list-by-time', this.timeParams())
-			console.log(res)
-			this.singleList = res.data
-			this.$apply()
+			const timeParams = this.timeParams();
+			console.log(timeParams)
+			if (timeParams.startTime && timeParams.endTime) {
+				const res = await wxRequest.Get('record/list-by-time', this.timeParams())
+				if (res.data === '请先登录！') {
+        	 		wx.switchTab({
+             			url: '/pages/setting'
+         	 		})
+      			}
+				this.singleList = res.data
+				this.$apply()
+			}
+			
 		}
 
 		/**

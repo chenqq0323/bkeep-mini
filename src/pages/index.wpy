@@ -100,24 +100,18 @@
     }
 
     async getHeader () {
-      if (Session.get('header_load_cache')) {
-        this.header = Session.get('header_load_cache')
-        this.$apply()
-      }
-
       const data = await wxRequest.Get('index/get-today-info')
-      console.log(data.data)
+      if (data.data === '请先登录！') {
+         wx.switchTab({
+            url: '/pages/setting'
+         })
+      }
       this.header = data.data
       Session.set('header_load_cache', this.header)
       this.$apply()
     }
 
     async getList() {
-      if (Session.get('index_load_cache')) {
-        this.list = Session.get('index_load_cache')
-        this.$apply()
-      }
-
       const store = getStore()
       await store.dispatch(asyncList())
       const res = store.getState().statement.statements
@@ -142,6 +136,19 @@
     }
 
     recorder() {
+
+      // 可以通过 wx.getSetting 先查询一下用户是否授权了 "scope.record" 这个 scope
+      wx.getSetting({
+        success(res) {
+          if (!res.authSetting['scope.record']) {
+            wx.authorize({
+              scope: 'scope.record',
+            })
+          } else {
+          }
+        }
+      })
+
       const options = {
         duration: 10000,//指定录音的时长，单位 ms
         sampleRate: 16000,//采样率
