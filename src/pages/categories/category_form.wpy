@@ -4,7 +4,7 @@
       <view class="container">
         <view class="column">
           <text>分类名称</text>
-          <input class="remark" type="text" name="name" value="{{ category.name }}" placeholder="请输入分类名称"/>
+          <input class="remark" type="text" name="name" value="{{ category.name }}" bindinput="bindKeyName" placeholder="请输入分类名称"/>
         </view>
         
 
@@ -58,7 +58,8 @@
       curIndex: 0,
       isParentLevel: false,
       submiting: false,
-      isEditMold: false
+      isEditMold: false,
+      name: ''
     }
 
     onLoad (options) {
@@ -113,8 +114,8 @@
         this.curIndex = idx
         this.category.parentId = this.parentCategories[idx]['id']
       },
-      bindKeyName (e) {
-        this.category.name = e.detail.value
+      bindKeyName ( {detail} ) {
+        this.category.name = detail.value
       },
       redirect_url () {
         wx.navigateTo({ url: `/pages/forms/icons_chose?url=categories` })
